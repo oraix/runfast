@@ -1,4 +1,4 @@
-def cached(main_fn, on=None):
+def cached(main_fn, on=None, minutes_to_expire=10):
     import builtins
     import os
     import sys
@@ -9,18 +9,21 @@ def cached(main_fn, on=None):
 
     # check if we should actually run
     on = on or []
+    checks = on
+#    print(f"on :{on}, {type(on)}, {sys.argv}")
     if not isinstance(on, (list, tuple)):
         checks = [on]
     if not any(chk(sys.argv) for chk in checks):
+        # input(f"on :{on}, {type(on)}, {sys.argv}\nPress Enter to continue...")
         sys.exit(main_fn())
 
     # ok, we should cache this
     toolname = os.path.basename(sys.argv[0])
-    lockfile = f"/tmp/rf_{toolname}.lock"
-    cachefile = f'/tmp/rf_{toolname}.cache'
+    lockfile = f"D:/tmp/rf_{toolname}.lock"
+    cachefile = f'D:/tmp/rf_{toolname}.cache'
     delayed_rc = 0
     memory = Memory(cachefile, verbose=0)
-    cache_expire = timedelta(minutes=1)
+    cache_expire = timedelta(minutes=minutes_to_expire)
 
     @memory.cache
     def latest():
